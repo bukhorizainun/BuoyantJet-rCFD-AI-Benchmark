@@ -40,6 +40,12 @@ data/rcfd_snapshots/**
 # Allow sample data (tiny)
 !sample_data/**
 
+# Allow benchmark evaluation artifacts (small CSVs and summary YAMLs)
+# — these are the official record of each baseline evaluation
+!data/processed/benchmark/
+!data/processed/benchmark/*.csv
+!data/processed/benchmark/*.yaml
+
 # --- Compiled UDF libraries (Fluent) ---
 libudf_*/
 

@@ -10,20 +10,22 @@ validated.
 
 ## Contents
 
-| File                          | Status      | Purpose                                    |
-|-------------------------------|-------------|--------------------------------------------|
-| `dataset.py`                  | skeleton    | snapshot tensor loader                     |
-| `preprocessing.py`            | skeleton    | normalization, train/val/test splitting    |
-| `metrics.py`                  | implemented | MAE / maxAE / relative MAE / energy drift  |
-| `baseline_pod_regression.py`  | skeleton    | POD + linear regression                    |
-| `baseline_pod_lstm.py`        | skeleton    | POD + small LSTM                           |
-| `baseline_autoencoder.py`     | skeleton    | conv. autoencoder                          |
-| `train_baseline.py`           | skeleton    | dispatch by config                         |
-| `evaluate_baseline.py`        | skeleton    | run metrics on held-out test set           |
+| File                          | Status         | Purpose                                    |
+|-------------------------------|----------------|--------------------------------------------|
+| `dataset.py`                  | skeleton       | snapshot tensor loader                     |
+| `preprocessing.py`            | skeleton       | normalization, train/val/test splitting    |
+| `metrics.py`                  | implemented    | MAE / maxAE / relative MAE / energy drift  |
+| `baseline_pod_regression.py`  | **implemented** | POD + linear regression                    |
+| `baseline_pod_lstm.py`        | skeleton       | POD + small LSTM                           |
+| `baseline_autoencoder.py`     | skeleton       | conv. autoencoder                          |
+| `train_baseline.py`           | wired          | dispatch (POD live; others raise)          |
+| `evaluate_baseline.py`        | wired          | run eval (POD live; others raise)          |
+| `rank_sweep.py`               | implemented    | aggregate POD sweep summaries → CSV + plot |
 
-`metrics.py` is fully implemented because it is needed by
-`scripts/compare_cfd_rcfd.py` and any future model. Everything else is a
-`TODO`-driven stub.
+First baseline results (POD + linear time-stepper, held-out 10 % test
+window) live in `data/processed/benchmark/pod_regression_*.{csv,summary.yaml}`
+and the rank-sweep plot at `assets/figures/fig_pod_rank_sweep.png`.
+The repository README shows the headline numbers and the honesty caveats.
 
 ## Honesty contract
 

@@ -1,15 +1,19 @@
-"""Evaluate an AI baseline against the CFD reference — SKELETON.
+"""Evaluate an AI baseline against the CFD reference.
 
-Plan
-----
-1. Load the trained checkpoint named by ``--model`` and ``--run-id``.
-2. Predict the held-out test window.
-3. Compute MAE / max-AE / relative MAE / max relative error via
-   :mod:`ai_baseline.metrics`.
-4. Persist a CSV under ``data/processed/benchmark/<model>_<run_id>.csv``.
+Currently this thin wrapper re-runs the chosen baseline's full pipeline
+(fit + held-out evaluation) and writes the result CSV. For POD-regression
+that is cheap; for future DL models it will load a saved checkpoint
+instead of re-training.
 
-Until a baseline is actually trained, this module just refuses to invent
-numbers.
+Output
+------
+``data/processed/benchmark/<model>_<run_id>.csv`` plus a matching
+``.summary.yaml``.
+
+Usage::
+
+    python -m ai_baseline.evaluate_baseline --model pod_regression
+    python -m ai_baseline.evaluate_baseline --model pod_regression --rank 64
 """
 
 from __future__ import annotations
@@ -17,19 +21,33 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from . import baseline_pod_regression
+
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--model", required=True)
-    ap.add_argument("--run-id", required=True)
-    ap.add_argument("--out", default="data/processed/benchmark", type=Path)
+    ap.add_argument("--model", required=True,
+                    choices=["pod_regression"])  # only one trained model for now
+    ap.add_argument("--rank", type=int, default=None)
+    ap.add_argument("--run-id", type=str, default=None)
+    ap.add_argument("--benchmark-config", type=Path,
+                    default=Path("configs/benchmark_config.yaml"))
+    ap.add_argument("--dataset-config", type=Path,
+                    default=Path("configs/dataset_config.yaml"))
     args = ap.parse_args()
 
+    if args.model == "pod_regression":
+        baseline_pod_regression.run(
+            benchmark_cfg_path=args.benchmark_config,
+            dataset_cfg_path=args.dataset_config,
+            rank=args.rank,
+            run_id=args.run_id,
+        )
+        return
+
     raise SystemExit(
-        f"evaluate_baseline is a skeleton. To evaluate '{args.model}/"
-        f"{args.run_id}', first implement training in ai_baseline/baseline_*.py "
-        "and save a checkpoint. Faking numbers in this script would violate "
-        "the honesty contract in ai_baseline/README.md."
+        f"evaluate_baseline does not yet support '{args.model}'. "
+        "Implement the baseline's run() first, then add a branch here."
     )
 
 

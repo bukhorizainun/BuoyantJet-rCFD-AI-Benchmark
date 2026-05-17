@@ -1,0 +1,14 @@
+rank: 16
+n_train: 504
+n_val: 63
+n_test: 63
+recon_mae_norm: 0.02674649842083454
+recon_max_norm: 0.6260231137275696
+recon_mae_K_approx: 1.0698599368333817
+recon_max_K_approx: 25.040924549102783
+pred_mae_norm: 0.03152703121304512
+pred_max_norm: 0.8179745674133301
+pred_mae_K_approx: 1.2610812485218048
+pred_max_K_approx: 32.7189826965332
+train_seconds: 2.3199825
+inference_seconds: 0.004582000000000086

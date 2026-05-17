@@ -225,19 +225,57 @@ Full design: [`docs/benchmark_design.md`](docs/benchmark_design.md).
 
 ## 10. AI-Ready Infrastructure
 
-`ai_baseline/` is **infrastructure only** for now:
+`ai_baseline/` provides infrastructure and a first working baseline:
 
-- `dataset.py` — snapshot loader skeleton (image stacks → arrays).
-- `preprocessing.py` — image-to-temperature decoding and normalization
-  utilities.
-- `metrics.py` — MAE, max-AE, relative error, energy-conservation diagnostic.
-- `baseline_pod_regression.py` — POD + linear regression skeleton.
-- `baseline_pod_lstm.py` — POD + small LSTM skeleton.
-- `baseline_autoencoder.py` — convolutional autoencoder skeleton.
-- `train_baseline.py` / `evaluate_baseline.py` — training/eval entry points.
+| Module                          | Status     |
+|---------------------------------|------------|
+| `dataset.py`, `preprocessing.py`| skeleton   |
+| `metrics.py`                    | implemented |
+| `baseline_pod_regression.py`    | **implemented** (POD + linear time-stepper) |
+| `baseline_pod_lstm.py`          | skeleton   |
+| `baseline_autoencoder.py`       | skeleton   |
+| `train_baseline.py`             | wired (dispatches POD; raises for others) |
+| `evaluate_baseline.py`          | wired (re-runs POD eval; raises for others) |
+| `rank_sweep.py`                 | implemented (aggregates POD sweep results) |
 
-All of these contain `TODO`s where future work has to land. None of them
-produces a validated benchmark result yet.
+### First baseline result — POD + linear regression
+
+Evaluated on the last 10 % of the CFD snapshot tensor (held-out test
+window, 63 frames). Trained on the first 80 % (504 frames). Rank-sweep
+summary written to `data/processed/benchmark/pod_regression_rank_sweep.csv`:
+
+| POD rank | Recon. MAE (norm.) | Recon. MAE (≈ K) | Pred. MAE (norm.) | Pred. MAE (≈ K) | Fit | Inference |
+|----------|--------------------|------------------|-------------------|------------------|--------|-----------|
+| 8        | 0.0271 | 1.08 | 0.0299 | 1.20 | 2.27 s | 2.8 ms |
+| 16       | 0.0267 | 1.07 | 0.0315 | 1.26 | 2.32 s | 4.6 ms |
+| 32       | 0.0244 | 0.97 | 0.0305 | 1.22 | 2.31 s | 4.7 ms |
+| **64**   | **0.0234** | **0.94** | **0.0279** | **1.12** | 2.30 s | 4.0 ms |
+| 128      | 0.0224 | 0.90 | 0.0326 | 1.30 | 2.36 s | 11.9 ms |
+
+![POD rank sweep](assets/figures/fig_pod_rank_sweep.png)
+
+**Honest reading of these numbers:**
+
+- *"Normalized"* means grayscale image intensity in `[0, 1]`. The CFD
+  snapshots are rendered JPGs with a rainbow colormap, **not** raw Kelvin
+  fields. The "≈ K" column is a *rough* scaling by the 40 K driving span —
+  it is **not** comparable to the CFD-vs-rCFD MAE of 2.27 K (which was
+  computed on the true Kelvin `T_CoG` monitor). A direct node-value
+  exporter for honest Kelvin POD is on the roadmap.
+- Reconstruction MAE monotonically decreases with rank — that is just POD
+  doing its job.
+- Prediction (autoregressive) MAE has a sweet spot at **rank 64**.
+  Beyond that the linear time-stepper starts overfitting to noise in
+  the higher modes.
+- A reduction-of-1.5x in prediction MAE vs reconstruction MAE means the
+  surrogate is *almost* hitting the compression floor — a more
+  expressive time-stepper (LSTM, FNO) might squeeze more out, but not a
+  lot, until the underlying data is in true Kelvin.
+
+The remaining `baseline_pod_lstm.py` and `baseline_autoencoder.py` still
+contain `NotImplementedError` stubs. They are gated by the same honesty
+contract: no number enters this table without a CSV under
+`data/processed/benchmark/` produced by `evaluate_baseline.py`.
 
 ---
 
@@ -338,7 +376,8 @@ via `scripts/make_animation.py` and `scripts/make_comparison_animation.py`.
 - [x] Step 1 — Validated CFD reference + rCFD replay
 - [x] Step 1 — CFD vs. rCFD quantitative comparison
 - [x] Step 1 — AI-ready dataset structure
-- [ ] Step 2 — POD + regression baseline
+- [x] Step 2 — POD + regression baseline (grayscale snapshots, rank sweep)
+- [ ] Step 2 — Direct Kelvin-field exporter (node values from Fluent)
 - [ ] Step 2 — POD + LSTM latent-time-stepper
 - [ ] Step 2 — Convolutional autoencoder for field compression
 - [ ] Step 2 — ConvLSTM / FNO surrogate
