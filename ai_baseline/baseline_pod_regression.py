@@ -23,7 +23,7 @@ non-linear mapping). Errors are reported in normalized space and also
 scaled by ``driving_span_K`` from ``configs/dataset_config.yaml`` to give
 an order-of-magnitude Kelvin number. The K numbers here are **not** directly
 comparable to the CFD-vs-rCFD MAE of 2.27 K, which was computed on the true
-Kelvin ``T_CoG`` monitor.
+Kelvin ``T_mean`` monitor.
 
 This will be tightened once a direct node-value exporter is added (see
 ``docs/future_ai_extension.md``).

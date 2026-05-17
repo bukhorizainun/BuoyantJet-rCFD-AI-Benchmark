@@ -260,7 +260,7 @@ summary written to `data/processed/benchmark/pod_regression_rank_sweep.csv`:
   snapshots are rendered JPGs with a rainbow colormap, **not** raw Kelvin
   fields. The "≈ K" column is a *rough* scaling by the 40 K driving span —
   it is **not** comparable to the CFD-vs-rCFD MAE of 2.27 K (which was
-  computed on the true Kelvin `T_CoG` monitor). A direct node-value
+  computed on the true Kelvin `T_mean` monitor). A direct node-value
   exporter for honest Kelvin POD is on the roadmap.
 - Reconstruction MAE monotonically decreases with rank — that is just POD
   doing its job.
@@ -360,7 +360,7 @@ versions in the same folder are git-ignored):
 
 The post-processing pipeline (see `assets/figures/`) reproduces:
 
-- CFD vs. rCFD overlay on `T_CoG(t)`
+- CFD vs. rCFD overlay on `T_mean(t)` (mass-weighted global mean temperature)
 - Absolute error evolution
 - Snapshot grids at matched indices
 

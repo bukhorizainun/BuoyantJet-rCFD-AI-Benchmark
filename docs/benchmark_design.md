@@ -15,11 +15,28 @@ buoyant jet case.
 
 All comparisons are anchored to the CFD reference using:
 
-- **Centre-of-gravity temperature** `T_CoG(t)` — primary scalar benchmark
-  (column 2 of `*_temperature.out`).
-- **Full 2D temperature field** `T(x, y, t)` — used for spatial errors and
-  for AI training.
+- **Mass-weighted mean temperature** `T_mean(t)` — primary scalar benchmark.
+  This is column 1 (zero-indexed) of `*_temperature.out`, written by
+  `DEFINE_EXECUTE_AT_END(CFD_write_temperature)` in the upstream UDF
+  (`bouyant_jet_replay/user_src/CFD_user.c`) as
+  `T_mean = sum(cell_mass * T) / sum(cell_mass)`.
+- **Temperature CoG y-coordinate** `CoGy_T(t)` — stratification diagnostic
+  in metres (NOT a temperature). Column 2 of `*_temperature.out`,
+  computed as `CoGy_T = sum(cell_mass * y * T) / sum(cell_mass * T)`.
+  Used by `comparison_TMean_CoG.m` to visualize how high the heated
+  fluid has risen.
+- **Full 2D temperature field** `T(x, y, t)` — used for spatial errors
+  and AI training. Currently only available as rendered JPGs; a direct
+  node-value exporter is planned (see `docs/future_ai_extension.md`).
 - **Energy balance** — sanity check that energy is (approximately) conserved.
+
+> ⚠️ **Naming note.** The upstream MATLAB script `analysis_complete.m`
+> reads column 2 of `*_temperature.out` and stores it in a variable
+> called `T_cog`. That variable name is misleading — physically it is
+> the **mass-weighted mean temperature** `T_mean`, not the CoG. The
+> actual CoG y-coordinate lives in column 3 (1-indexed MATLAB) /
+> column 2 (0-indexed Python). This repository uses `T_mean` for the
+> column-1 quantity to match the C source.
 
 ## 3. Metric conventions
 
@@ -34,7 +51,9 @@ results table and in the Step 1 progress report.
 
 Definition:
 
-1. Read CFD and rCFD `*_temperature.out` files; column 2 is `T_CoG`.
+1. Read CFD and rCFD `*_temperature.out` files; the relevant value is
+   column 1 (zero-indexed) — the mass-weighted `T_mean`. (Column 2 is
+   the CoG y-coordinate in metres and is not used in the MAE metric.)
 2. Drop the duplicate `t=0` row that rCFD writes at startup.
 3. Form a 500-point common grid
    `t_common = linspace(max(t_cfd[0], t_rcfd[0]), min(t_cfd[-1], t_rcfd[-1]), 500)`.
@@ -105,7 +124,8 @@ visualizations, or numbers from other test cases must not be merged.
 
 ## 5. Comparison protocol
 
-1. Parse CFD and rCFD `*_temperature.out` files (column 2 = `T_CoG`).
+1. Parse CFD and rCFD `*_temperature.out` files
+   (column 1 zero-indexed = `T_mean`; column 2 = CoG y-coord, unused here).
 2. Apply the MATLAB-style interpolation onto `t_common` of 500 points.
 3. Compute MAE, max AE, mean / max relative error.
 4. Also report the physically aligned MAE as a sanity check.
