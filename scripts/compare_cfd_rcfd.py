@@ -3,8 +3,12 @@
 Replicates the metric definition used by ``analysis_complete.m`` in the
 upstream MATLAB post-processing (see ``docs/benchmark_design.md``):
 
-1. Load column 2 of ``*_temperature.out`` — this is the mass-weighted /
-   centre-of-gravity temperature ``T_CoG`` reported by Fluent.
+1. Load column 1 (zero-indexed) of ``*_temperature.out`` — this is
+   ``T_mean``, the mass-weighted global mean temperature written by
+   ``DEFINE_EXECUTE_AT_END(CFD_write_temperature)`` in the upstream UDF
+   (`bouyant_jet_replay/user_src/CFD_user.c`). Column 2 of that file is
+   ``CoGy_T`` (the y-coordinate of the temperature centre of gravity,
+   in metres) and is used by MATLAB only for the stratification plot.
 2. Deduplicate rCFD time-zero rows (rCFD writes ``t=0`` twice at startup).
 3. Interpolate both curves linearly onto a 500-point common time grid
    ``t_common = linspace(max(t_cfd[0], t_rcfd[0]), min(t_cfd[-1], t_rcfd[-1]), 500)``.
@@ -84,7 +88,7 @@ def main() -> None:
     # Physically aligned: re-base CFD so its first sample = 0 s (== rCFD t=0).
     rebased = _compare(t_cfd - t_cfd[0], T_cfd, t_rcfd, T_rcfd)
 
-    print("=== CFD vs. rCFD on T_CoG (MATLAB-style, matches Step 1 validated numbers) ===")
+    print("=== CFD vs. rCFD on T_mean (MATLAB-style, matches Step 1 validated numbers) ===")
     print(f"  N common samples : {len(matlab['t_common'])}")
     print(f"  MAE              : {matlab['mae']:8.4f} K")
     print(f"  Max abs. error   : {matlab['max_ae']:8.4f} K")
@@ -118,7 +122,7 @@ def main() -> None:
     axes[0].plot(matlab["t_common"], matlab["T_rcfd_interp"],
                  label="rCFD replay", color="#d62728", lw=1.3,
                  linestyle="--")
-    axes[0].set_ylabel(r"$T_\mathrm{CoG}$ [K]")
+    axes[0].set_ylabel(r"$T_\mathrm{mean}$ [K]")
     axes[0].grid(alpha=0.3)
     axes[0].legend(loc="best")
     axes[0].set_title(
