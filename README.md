@@ -198,8 +198,10 @@ data/
 
 Large `.cas.h5` / `.dat.h5` Fluent files and full snapshot folders are
 **git-ignored**. Instructions for placing them locally live in
-[`data/README.md`](data/README.md). A tiny demo set lives in
-[`sample_data/`](sample_data/).
+[`data/README.md`](data/README.md). A tiny **72 KB** demo set (5 CFD +
+5 rCFD frames + truncated CSV monitors) ships in
+[`sample_data/`](sample_data/) so the repo is smoke-testable right
+after cloning, without the multi-gigabyte original outputs.
 
 Full description: [`docs/dataset_description.md`](docs/dataset_description.md).
 
