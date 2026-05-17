@@ -379,7 +379,9 @@ via `scripts/make_animation.py` and `scripts/make_comparison_animation.py`.
 - [x] Step 1 — CFD vs. rCFD quantitative comparison
 - [x] Step 1 — AI-ready dataset structure
 - [x] Step 2 — POD + regression baseline (grayscale snapshots, rank sweep)
-- [ ] Step 2 — Direct Kelvin-field exporter (node values from Fluent)
+- [~] Step 2 — Direct Kelvin-field exporter (UDF + Python parser scaffolded
+      in `udf/` and `scripts/import_temperature_field.py`; needs Fluent
+      compile + run — see [`docs/kelvin_field_exporter.md`](docs/kelvin_field_exporter.md))
 - [ ] Step 2 — POD + LSTM latent-time-stepper
 - [ ] Step 2 — Convolutional autoencoder for field compression
 - [ ] Step 2 — ConvLSTM / FNO surrogate
