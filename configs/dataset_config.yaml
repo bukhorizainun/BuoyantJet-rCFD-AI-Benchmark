@@ -1,0 +1,28 @@
+# Dataset configuration for AI-ready tensor preparation.
+# Consumed by scripts/prepare_ai_dataset.py and ai_baseline/dataset.py.
+
+# Image preprocessing
+image_size: [128, 128]      # [W, H] target resolution for snapshots
+color_mode: grayscale       # 'grayscale' (default) or 'rgb' (future)
+
+# Time axis
+time_step_s: 0.2            # physical time-step matching the CFD/rCFD runs
+cfd:
+  glob: "CFD_T_path_*.jpg"
+  expected_count: 630
+  spinup_offset: 30         # CFD has 30 extra frames before rCFD t=0
+rcfd:
+  glob: "rCFD_BJet_*.jpg"
+  expected_count: 600
+
+# Physical anchors (for the eventual Kelvin decoder)
+temperature:
+  t_ambient_K: 293.0
+  t_jet_K: 333.0
+  driving_span_K: 40.0
+
+# Train/val/test split (chronological)
+split:
+  train: 0.80
+  val: 0.10
+  test: 0.10               # final 10 % is strictly held out

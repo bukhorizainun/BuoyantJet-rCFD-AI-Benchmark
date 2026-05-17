@@ -1,0 +1,51 @@
+# Benchmark configuration. Consumed by ai_baseline/train_baseline.py and
+# ai_baseline/evaluate_baseline.py (both still skeletons — see README).
+
+# Data sources
+data:
+  cfd_tensor:  data/processed/cfd_T_field.npy
+  rcfd_tensor: data/processed/rcfd_T_field.npy
+  cfd_t_mean:  data/processed/cfd_T_mean.csv
+  rcfd_t_mean: data/processed/rcfd_T_mean.csv
+
+# Metric definitions
+metrics:
+  t_ambient_K: 293.0
+  driving_span_K: 40.0
+  report:
+    - mae_K
+    - max_ae_K
+    - rel_mae
+    - rel_max
+    - energy_drift
+    - speedup_vs_cfd
+    - speedup_vs_rcfd
+
+# Model hyperparameter scaffolding (NOT yet a trained config).
+models:
+  pod_regression:
+    rank: 32
+
+  pod_lstm:
+    rank: 32
+    hidden_size: 64
+    num_layers: 1
+    window: 8
+    horizon: 1
+    lr: 1.0e-3
+    epochs: 50
+    batch_size: 32
+    seed: 0
+
+  autoencoder:
+    latent_dim: 32
+    base_channels: 16
+    depth: 3
+    lr: 1.0e-3
+    epochs: 50
+    batch_size: 16
+    seed: 0
+
+# Where evaluation CSVs are written.
+output:
+  benchmark_dir: data/processed/benchmark

@@ -1,0 +1,76 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# --- OS / IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Notebook checkpoints ---
+.ipynb_checkpoints/
+
+# --- Large CFD / rCFD artifacts (NEVER commit) ---
+*.cas.h5
+*.dat.h5
+*.cas
+*.dat
+*.msh
+*.cdat
+*.trn
+*.out
+
+# --- Heavy datasets ---
+data/raw/**
+data/processed/**
+data/cfd_snapshots/**
+data/rcfd_snapshots/**
+!data/**/.gitkeep
+!data/README.md
+!data/metadata/**.yaml
+!data/metadata/**.yml
+!data/metadata/**.json
+
+# Allow sample data (tiny)
+!sample_data/**
+
+# --- Compiled UDF libraries (Fluent) ---
+libudf_*/
+
+# --- Build / cache ---
+*.log
+*.aux
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+
+# --- AI artifacts ---
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.onnx
+runs/
+lightning_logs/
+mlruns/
+wandb/
+
+# --- Animations / heavy media (commit only small previews) ---
+assets/animations/*.avi
+assets/animations/*.mp4
+assets/animations/cfd.gif
+assets/animations/rcfd.gif
+assets/animations/cfd_vs_rcfd.gif
+# Keep the small preview for README embedding
+!assets/animations/cfd_vs_rcfd_preview.gif
+
+# --- Local environment ---
+.env
+.envrc

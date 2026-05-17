@@ -1,0 +1,45 @@
+# Provenance manifest for the validated Step 1 dataset.
+# Tracked in git so the dataset description survives without the bulk files.
+
+case:
+  name: BuoyantJet-adiabatic
+  fluid: water
+  wall_condition: adiabatic
+  jet_inlet_T_K: 333.0
+  tank_initial_T_K: 293.0
+
+mesh:
+  cells: 85625
+  nodes: 94216
+
+solver:
+  package: ANSYS Fluent
+  version: 2026 R1
+  precision: 3ddp
+  partitions: 4
+
+time_integration:
+  dt_s: 0.2
+  cfd_physical_time_s: 658.0
+  rcfd_episodes: 600
+
+dataset:
+  cfd_snapshots: 630
+  rcfd_snapshots: 600
+  snapshot_dt_s: 0.2
+  snapshot_format: jpg
+
+accuracy_vs_cfd:
+  metric: tank mean temperature
+  mae_K: 2.27
+  max_ae_K: 6.92
+  rel_mae_pct: 0.74
+  rel_max_pct: 2.36
+
+performance:
+  rcfd_speedup_vs_cfd: 37.6
+
+source:
+  upstream_tutorial: bouyant_jet_replay
+  upstream_origin: JKU Linz / Institute of Particulate Flow Modelling (PFM)
+  adapted_to: Windows 11
